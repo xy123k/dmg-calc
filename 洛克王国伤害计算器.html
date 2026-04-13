@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>洛克王国 · 伤害计算器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #e2f0da;
+            padding: 12px 8px 30px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 520px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e4a2b;
+            text-align: center;
+            margin-bottom: 2px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #c8e0bc;
+        }
+        .subhead {
+            text-align: center;
+            color: #3d6b41;
+            margin-bottom: 18px;
+            font-weight: 600;
+            font-size: 1rem;
+            border-bottom: 2px dashed #9abb90;
+            padding-bottom: 10px;
+        }
+        .card {
+            background: #f9fff7;
+            border-radius: 32px;
+            padding: 22px 16px;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 16px rgba(25, 55, 20, 0.08);
+            border: 1px solid #bfdbb4;
+        }
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.45rem;
+            color: #1f4a24;
+            margin-bottom: 20px;
+            border-left: 10px solid #5fa05b;
+            padding-left: 16px;
+        }
+        .two-column {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        @media (min-width: 480px) {
+            .two-column {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+        }
+        .stat-box {
+            background: #ecf6e7;
+            border-radius: 24px;
+            padding: 18px 14px;
+            border: 1px solid #aace9c;
+        }
+        .stat-box h3 {
+            font-size: 1.25rem;
+            margin-bottom: 14px;
+            color: #235f28;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #2e6b33;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #b1d0a4;
+            border-radius: 24px;
+            background: white;
+            font-size: 1.1rem;
+            transition: border 0.15s;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #3f9140;
+            box-shadow: 0 0 0 4px rgba(63, 145, 64, 0.15);
+        }
+        .result-badge {
+            background: #1c451c;
+            color: #f2fce8;
+            padding: 14px 16px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 1.6rem;
+            text-align: center;
+            margin-top: 12px;
+            box-shadow: inset 0 2px 5px #0f2a0f;
+            letter-spacing: 1px;
+        }
+        .fill-btn {
+            background: #c7e2bd;
+            border: 2px solid #528a4e;
+            color: #153d18;
+            font-weight: 700;
+            padding: 14px 12px;
+            border-radius: 48px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            margin-top: 12px;
+            width: 100%;
+            box-shadow: 0 3px 0 #3f6e3a;
+        }
+        .fill-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+        .inline-flex {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .damage-formula-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .damage-formula-row .input-group {
+            flex: 1 1 140px;
+            min-width: 120px;
+            margin-bottom: 0;
+        }
+        .damage-preview {
+            background: linear-gradient(145deg, #194019, #2a632a);
+            border-radius: 60px;
+            padding: 20px 18px;
+            color: #faffeb;
+            text-align: center;
+            margin: 20px 0 12px;
+            border: 2px solid #b1da94;
+        }
+        .damage-number {
+            font-size: 3.8rem;
+            font-weight: 1000;
+            line-height: 1.2;
+            text-shadow: 4px 4px 0 #0f2a0f;
+        }
+        .damage-label {
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        .footnote {
+            font-size: 0.9rem;
+            color: #407540;
+            margin-top: 14px;
+            text-align: center;
+        }
+        .flex-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        @media (min-width: 400px) {
+            .flex-row {
+                flex-direction: row;
+            }
+        }
+        .separator {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8fb682, transparent);
+            margin: 20px 0 10px;
+        }
+        button {
+            background: #408040;
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 16px 20px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 2px solid #1c531c;
+            box-shadow: 0 5px 0 #1d421d;
+            transition: 0.1s;
+            width: 100%;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #1e3e1e;
+        }
+        .small-note {
+            color: #3e6a3e;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        .type-selector {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0 18px;
+        }
+        .type-btn {
+            background: #d9ecce;
+            border: 2px solid #6da166;
+            border-radius: 60px;
+            padding: 16px 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1c481c;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: all 0.1s;
+            box-shadow: 0 3px 0 #4f7949;
+        }
+        .type-btn.active {
+            background: #2f7a2f;
+            color: white;
+            border-color: #135013;
+            box-shadow: inset 0 3px 6px #1d351d;
+        }
+        .type-btn:active {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+        .error-msg {
+            color: #c04242;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+        /* 针对极窄屏优化 */
+        @media (max-width: 380px) {
+            .damage-formula-row .input-group {
+                min-width: 100%;
+            }
+            .card {
+                padding: 18px 12px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        select {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="%23336633" d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 22px;
+            padding-right: 48px !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>⚔️ 洛克伤害仪 ⚔️</h1>
+    <div class="subhead">种族·个体·性格 · 威力连击</div>
+
+    <!-- 能力值计算器 -->
+    <div class="card">
+        <div class="card-title"><span>📊 能力值工坊</span></div>
+        <div class="two-column">
+            <!-- 攻击方 -->
+            <div class="stat-box">
+                <h3>⚡ 攻击方</h3>
+                <div class="input-group">
+                    <label>种族值 (攻击/魔攻)</label>
+                    <input type="number" id="atkRace" value="120" min="1" max="300" step="1" inputmode="numeric">
+                </div>
+                <div class="input-group">
+                    <label>初始个体值 (0~10)</label>
+                    <input type="number" id="atkIndiv" value="8" min="0" max="10" step="1" inputmode="numeric">
+                </div>
+                <div class="input-group">
+                    <label>性格修正</label>
+                    <select id="atkNature">
+                        <option value="1.2">➕ 1.2 (加成)</option>
+                        <option value="1.0" selected>🟰 1.0 (无修正)</option>
+                        <option value="0.9">➖ 0.9 (削弱)</option>
+                    </select>
+                </div>
+                <div class="result-badge" id="atkResult">0</div>
+                <button class="fill-btn" id="fillAtkToDamage">⬆️ 填入攻击力</button>
+                <div class="small-note" style="margin-top:10px;">用于物理/魔法</div>
+            </div>
+            <!-- 防御方 -->
+            <div class="stat-box">
+                <h3>🛡️ 防御方</h3>
+                <div class="input-group">
+                    <label>种族值 (防御/魔抗)</label>
+                    <input type="number" id="defRace" value="100" min="1" max="300" step="1" inputmode="numeric">
+                </div>
+                <div class="input-group">
+                    <label>初始个体值 (0~10)</label>
+                    <input type="number" id="defIndiv" value="7" min="0" max="10" step="1" inputmode="numeric">
+                </div>
+                <div class="input-group">
+                    <label>性格修正</label>
+                    <select id="defNature">
+                        <option value="1.2">➕ 1.2 (加成)</option>
+                        <option value="1.0" selected>🟰 1.0 (无修正)</option>
+                        <option value="0.9">➖ 0.9 (削弱)</option>
+                    </select>
+                </div>
+                <div class="result-badge" id="defResult">0</div>
+                <button class="fill-btn" id="fillDefToDamage">⬇️ 填入防御力</button>
+                <div class="small-note">物防 / 魔抗通用</div>
+            </div>
+        </div>
+        <div style="margin-top: 16px; font-size:0.95rem; color:#2b5e2b; text-align:center; background:#def0d4; padding:10px; border-radius:40px;">
+            💡 (1.1×(种族+0.5×(个体×6))+10)×性格+50
+        </div>
+    </div>
+
+    <!-- 伤害计算核心 -->
+    <div class="card">
+        <div class="card-title"><span>💥 伤害演算 · 0.9×a×b×c×d×(攻击/防御)×e</span></div>
+        
+        <!-- 技能类型切换 -->
+        <div class="type-selector">
+            <div class="type-btn active" id="typePhysical">⚔️ 物理 · 攻/防</div>
+            <div class="type-btn" id="typeMagic">🔮 魔法 · 魔攻/魔抗</div>
+        </div>
+
+        <!-- 攻击 / 防御 -->
+        <div class="flex-row">
+            <div class="input-group" style="flex:1;">
+                <label>🗡️ 攻击力</label>
+                <input type="number" id="damageAtk" value="200" min="0" step="0.1" inputmode="decimal">
+            </div>
+            <div class="input-group" style="flex:1;">
+                <label>🛡️ 防御力</label>
+                <input type="number" id="damageDef" value="180" min="1" step="0.1" inputmode="decimal">
+            </div>
+        </div>
+
+        <div class="damage-formula-row">
+            <div class="input-group">
+                <label>a · 基础威力</label>
+                <input type="number" id="powerA" value="90" min="1" step="1" inputmode="numeric">
+            </div>
+            <div class="input-group">
+                <label>b · 本系加成</label>
+                <select id="stabB">
+                    <option value="1.0">1.0 (非本系)</option>
+                    <option value="1.25" selected>1.25 (本系)</option>
+                </select>
+            </div>
+        </div>
+        <div class="damage-formula-row">
+            <div class="input-group">
+                <label>c · 属性克制</label>
+                <select id="typeC">
+                    <option value="3.0">3.0 (双重克制?)</option>
+                    <option value="2.0" selected>2.0 (单克制)</option>
+                    <option value="1.0">1.0 (正常)</option>
+                    <option value="0.5">0.5 (抵抗)</option>
+                    <option value="0.333">0.333 (1/3抵抗)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>c 自定义</label>
+                <input type="number" id="customC" value="2.0" step="0.1" min="0.1" inputmode="decimal">
+            </div>
+        </div>
+        <div class="damage-formula-row">
+            <div class="input-group">
+                <label>d · 增减益</label>
+                <input type="number" id="buffD" value="1.0" step="0.1" min="0.1" inputmode="decimal">
+            </div>
+            <div class="input-group">
+                <label>e · 连击数</label>
+                <input type="number" id="comboE" value="1" min="1" step="1" inputmode="numeric">
+            </div>
+        </div>
+
+        <div class="damage-preview">
+            <div class="damage-label">预估伤害</div>
+            <div class="damage-number" id="damageOutput">--</div>
+        </div>
+        <div id="damageNote" class="small-note" style="text-align:center;"></div>
+        <button id="calcDamageBtn">🔥 计算伤害</button>
+    </div>
+    <div class="footnote">
+        * 连击数e为总段数 · 公式整合 · 洛克王国世界
+    </div>
+</div>
+
+<script>
+    (function(){
+        "use strict";
+
+        function calcAbility(race, indiv, natureMult) {
+            race = parseFloat(race) || 0;
+            indiv = parseFloat(indiv) || 0;
+            natureMult = parseFloat(natureMult) || 1.0;
+            const inner = 1.1 * (race + 0.5 * (indiv * 6)) + 10;
+            let result = inner * natureMult + 50;
+            return Math.round(result * 10) / 10;
+        }
+
+        const atkRace = document.getElementById('atkRace');
+        const atkIndiv = document.getElementById('atkIndiv');
+        const atkNature = document.getElementById('atkNature');
+        const atkResult = document.getElementById('atkResult');
+
+        const defRace = document.getElementById('defRace');
+        const defIndiv = document.getElementById('defIndiv');
+        const defNature = document.getElementById('defNature');
+        const defResult = document.getElementById('defResult');
+
+        const damageAtk = document.getElementById('damageAtk');
+        const damageDef = document.getElementById('damageDef');
+        const powerA = document.getElementById('powerA');
+        const stabB = document.getElementById('stabB');
+        const typeC = document.getElementById('typeC');
+        const customC = document.getElementById('customC');
+        const buffD = document.getElementById('buffD');
+        const comboE = document.getElementById('comboE');
+        const damageOutput = document.getElementById('damageOutput');
+        const damageNote = document.getElementById('damageNote');
+
+        const btnPhysical = document.getElementById('typePhysical');
+        const btnMagic = document.getElementById('typeMagic');
+        let skillType = 'physical';
+
+        function updateAbilityResults() {
+            const aRace = parseFloat(atkRace.value) || 0;
+            const aIndiv = parseFloat(atkIndiv.value) || 0;
+            const aNat = parseFloat(atkNature.value) || 1.0;
+            const atkVal = calcAbility(aRace, aIndiv, aNat);
+            atkResult.textContent = atkVal.toFixed(1);
+
+            const dRace = parseFloat(defRace.value) || 0;
+            const dIndiv = parseFloat(defIndiv.value) || 0;
+            const dNat = parseFloat(defNature.value) || 1.0;
+            const defVal = calcAbility(dRace, dIndiv, dNat);
+            defResult.textContent = defVal.toFixed(1);
+        }
+
+        function fillAttackToDamage() {
+            damageAtk.value = parseFloat(atkResult.textContent).toFixed(1);
+            computeDamage();
+        }
+        function fillDefenseToDamage() {
+            damageDef.value = parseFloat(defResult.textContent).toFixed(1);
+            computeDamage();
+        }
+
+        function computeDamage() {
+            const atk = parseFloat(damageAtk.value);
+            const def = parseFloat(damageDef.value);
+            if (isNaN(atk) || isNaN(def) || def === 0) {
+                damageOutput.textContent = 'ERR';
+                damageNote.textContent = '攻击/防御无效，防御不能为0';
+                return;
+            }
+            const a = parseFloat(powerA.value) || 0;
+            const b = parseFloat(stabB.value) || 1.0;
+            let c = parseFloat(customC.value);
+            if (isNaN(c) || c <= 0) c = 2.0;
+            const d = parseFloat(buffD.value) || 1.0;
+            const e = parseFloat(comboE.value) || 1;
+
+            const base = 0.9 * a * b * c * d * (atk / def) * e;
+            const damageVal = Math.round(base * 100) / 100;
+            damageOutput.textContent = damageVal.toFixed(1);
+            
+            let typeStr = (skillType === 'physical') ? '物理' : '魔法';
+            damageNote.textContent = `${typeStr} · 克制系数: ${c.toFixed(3)}`;
+        }
+
+        function syncCFromSelect() {
+            customC.value = typeC.value;
+        }
+
+        function bindEvents() {
+            const abilityInputs = [atkRace, atkIndiv, atkNature, defRace, defIndiv, defNature];
+            abilityInputs.forEach(el => el.addEventListener('input', updateAbilityResults));
+            
+            document.getElementById('fillAtkToDamage').addEventListener('click', fillAttackToDamage);
+            document.getElementById('fillDefToDamage').addEventListener('click', fillDefenseToDamage);
+            document.getElementById('calcDamageBtn').addEventListener('click', computeDamage);
+
+            typeC.addEventListener('change', function() {
+                syncCFromSelect();
+                computeDamage();
+            });
+            
+            btnPhysical.addEventListener('click', function() {
+                btnPhysical.classList.add('active');
+                btnMagic.classList.remove('active');
+                skillType = 'physical';
+                computeDamage();
+            });
+            btnMagic.addEventListener('click', function() {
+                btnMagic.classList.add('active');
+                btnPhysical.classList.remove('active');
+                skillType = 'magic';
+                computeDamage();
+            });
+
+            const damageInputs = [damageAtk, damageDef, powerA, stabB, customC, buffD, comboE];
+            damageInputs.forEach(el => el.addEventListener('input', computeDamage));
+            stabB.addEventListener('change', computeDamage);
+            
+            updateAbilityResults();
+            setTimeout(() => {
+                fillAttackToDamage();
+                fillDefenseToDamage();
+            }, 30);
+        }
+
+        function clampIndiv(inputEl) {
+            let val = parseInt(inputEl.value);
+            if (isNaN(val)) val = 0;
+            val = Math.min(10, Math.max(0, val));
+            inputEl.value = val;
+            updateAbilityResults();
+        }
+        atkIndiv.addEventListener('change', function() { clampIndiv(atkIndiv); });
+        defIndiv.addEventListener('change', function() { clampIndiv(defIndiv); });
+        atkIndiv.addEventListener('input', function() { 
+            let v = parseInt(this.value); if(!isNaN(v)) this.value = Math.min(10, Math.max(0, v));
+        });
+        defIndiv.addEventListener('input', function() { 
+            let v = parseInt(this.value); if(!isNaN(v)) this.value = Math.min(10, Math.max(0, v));
+        });
+
+        [atkRace, defRace].forEach(inp => inp.addEventListener('change', function() {
+            let v = parseFloat(this.value);
+            if (v < 1) this.value = 1;
+            updateAbilityResults();
+        }));
+
+        bindEvents();
+        syncCFromSelect();
+    })();
+</script>
+</body>
+</html>

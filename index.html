@@ -144,11 +144,6 @@
             transform: translateY(3px);
             box-shadow: none;
         }
-        .inline-flex {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
         .damage-formula-row {
             display: flex;
             flex-wrap: wrap;
@@ -196,11 +191,6 @@
             .flex-row {
                 flex-direction: row;
             }
-        }
-        .separator {
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #8fb682, transparent);
-            margin: 20px 0 10px;
         }
         button {
             background: #408040;
@@ -259,7 +249,6 @@
             font-size: 0.95rem;
             margin-top: 6px;
         }
-        /* 针对极窄屏优化 */
         @media (max-width: 380px) {
             .damage-formula-row .input-group {
                 min-width: 100%;
@@ -277,6 +266,16 @@
             background-position: right 16px center;
             background-size: 22px;
             padding-right: 48px !important;
+        }
+        .formula-highlight {
+            background: #e6f2de;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            color: #1b4b1b;
+            text-align: center;
+            margin: 12px 0 8px;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -343,7 +342,10 @@
 
     <!-- 伤害计算核心 -->
     <div class="card">
-        <div class="card-title"><span>💥 伤害演算 · 0.9×a×b×c×d×(攻击/防御)×e</span></div>
+        <div class="card-title"><span>💥 伤害演算</span></div>
+        <div class="formula-highlight">
+            ⚡ 0.9 × (a + f) × b × c × d × (攻击/防御) × e
+        </div>
         
         <!-- 技能类型切换 -->
         <div class="type-selector">
@@ -363,11 +365,20 @@
             </div>
         </div>
 
+        <!-- 第一行: a (基础威力) 与 f (威力增加) -->
         <div class="damage-formula-row">
             <div class="input-group">
                 <label>a · 基础威力</label>
                 <input type="number" id="powerA" value="90" min="1" step="1" inputmode="numeric">
             </div>
+            <div class="input-group">
+                <label>f · 威力增加</label>
+                <input type="number" id="powerF" value="0" min="0" step="1" inputmode="numeric">
+            </div>
+        </div>
+
+        <!-- 第二行: b 本系加成 -->
+        <div class="damage-formula-row">
             <div class="input-group">
                 <label>b · 本系加成</label>
                 <select id="stabB">
@@ -375,8 +386,6 @@
                     <option value="1.25" selected>1.25 (本系)</option>
                 </select>
             </div>
-        </div>
-        <div class="damage-formula-row">
             <div class="input-group">
                 <label>c · 属性克制</label>
                 <select id="typeC">
@@ -387,16 +396,22 @@
                     <option value="0.333">0.333 (1/3抵抗)</option>
                 </select>
             </div>
+        </div>
+
+        <!-- 第三行: c自定义 与 d增减益 -->
+        <div class="damage-formula-row">
             <div class="input-group">
                 <label>c 自定义</label>
                 <input type="number" id="customC" value="2.0" step="0.1" min="0.1" inputmode="decimal">
             </div>
-        </div>
-        <div class="damage-formula-row">
             <div class="input-group">
                 <label>d · 增减益</label>
                 <input type="number" id="buffD" value="1.0" step="0.1" min="0.1" inputmode="decimal">
             </div>
+        </div>
+
+        <!-- 第四行: e 连击数 -->
+        <div class="damage-formula-row">
             <div class="input-group">
                 <label>e · 连击数</label>
                 <input type="number" id="comboE" value="1" min="1" step="1" inputmode="numeric">
@@ -411,7 +426,7 @@
         <button id="calcDamageBtn">🔥 计算伤害</button>
     </div>
     <div class="footnote">
-        * 连击数e为总段数 · 公式整合 · 洛克王国世界
+        * 连击数e为总段数 · f为威力增加值 · 洛克王国世界
     </div>
 </div>
 
@@ -441,6 +456,7 @@
         const damageAtk = document.getElementById('damageAtk');
         const damageDef = document.getElementById('damageDef');
         const powerA = document.getElementById('powerA');
+        const powerF = document.getElementById('powerF');   // 新增 f 威力增加
         const stabB = document.getElementById('stabB');
         const typeC = document.getElementById('typeC');
         const customC = document.getElementById('customC');
@@ -485,18 +501,20 @@
                 return;
             }
             const a = parseFloat(powerA.value) || 0;
+            const f = parseFloat(powerF.value) || 0;      // 威力增加
             const b = parseFloat(stabB.value) || 1.0;
             let c = parseFloat(customC.value);
             if (isNaN(c) || c <= 0) c = 2.0;
             const d = parseFloat(buffD.value) || 1.0;
             const e = parseFloat(comboE.value) || 1;
 
-            const base = 0.9 * a * b * c * d * (atk / def) * e;
+            // 新公式: 0.9 * (a + f) * b * c * d * (攻击/防御) * e
+            const base = 0.9 * (a + f) * b * c * d * (atk / def) * e;
             const damageVal = Math.round(base * 100) / 100;
             damageOutput.textContent = damageVal.toFixed(1);
             
             let typeStr = (skillType === 'physical') ? '物理' : '魔法';
-            damageNote.textContent = `${typeStr} · 克制系数: ${c.toFixed(3)}`;
+            damageNote.textContent = `${typeStr} · 总威力 ${a+f} · 克制系数: ${c.toFixed(3)}`;
         }
 
         function syncCFromSelect() {
@@ -529,7 +547,8 @@
                 computeDamage();
             });
 
-            const damageInputs = [damageAtk, damageDef, powerA, stabB, customC, buffD, comboE];
+            // 包含新增的 powerF
+            const damageInputs = [damageAtk, damageDef, powerA, powerF, stabB, customC, buffD, comboE];
             damageInputs.forEach(el => el.addEventListener('input', computeDamage));
             stabB.addEventListener('change', computeDamage);
             

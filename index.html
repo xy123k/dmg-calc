@@ -19,7 +19,7 @@
             align-items: center;
         }
         .container {
-            max-width: 520px;
+            max-width: 580px;
             width: 100%;
             margin: 0 auto;
         }
@@ -125,6 +125,9 @@
             margin-top: 12px;
             box-shadow: inset 0 2px 5px #0f2a0f;
             letter-spacing: 1px;
+        }
+        .result-badge.hp-badge {
+            background: #6b3e3e;
         }
         .fill-btn {
             background: #c7e2bd;
@@ -244,10 +247,55 @@
             transform: translateY(3px);
             box-shadow: none;
         }
-        .error-msg {
-            color: #c04242;
-            font-size: 0.95rem;
-            margin-top: 6px;
+        .toggle-btn {
+            background: #6b4f8c;
+            border-color: #3e2a54;
+            box-shadow: 0 5px 0 #2d1e3c;
+            margin-bottom: 16px;
+        }
+        .toggle-btn.active-toggle {
+            background: #9e6bb5;
+        }
+        .mark-panel {
+            background: #f3ebf9;
+            border-radius: 30px;
+            padding: 18px 16px;
+            margin: 16px 0;
+            border: 2px dashed #9b72b5;
+        }
+        .solve-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            background: #fff9e6;
+            border-radius: 30px;
+            padding: 18px 16px;
+            margin: 16px 0;
+            border: 2px solid #dcc98a;
+        }
+        .solve-row .input-group {
+            margin-bottom: 0;
+            flex: 1 1 120px;
+            min-width: 100px;
+        }
+        .solve-btn {
+            background: #bf8f2c;
+            border-color: #7a5a1a;
+            box-shadow: 0 5px 0 #6b4a14;
+            flex: 0 0 auto;
+            min-width: 90px;
+        }
+        .solve-result-box {
+            background: #fef9e7;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 12px 0;
+            border: 2px solid #e6c560;
+            font-size: 1.05rem;
+            color: #5a4720;
+            font-weight: 600;
+            text-align: center;
         }
         @media (max-width: 380px) {
             .damage-formula-row .input-group {
@@ -267,28 +315,29 @@
             background-size: 22px;
             padding-right: 48px !important;
         }
-        .formula-highlight {
-            background: #e6f2de;
+        .formula-note {
+            background: #def0d4;
             border-radius: 40px;
-            padding: 10px 16px;
-            font-size: 1rem;
-            color: #1b4b1b;
+            padding: 8px 14px;
+            font-size: 0.95rem;
+            color: #2b5e2b;
             text-align: center;
-            margin: 12px 0 8px;
             font-weight: 600;
+        }
+        .hp-formula {
+            background: #f9f2e0;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>⚔️ 洛克伤害仪 ⚔️</h1>
-    <div class="subhead">种族·个体·性格 · 威力连击</div>
+    <div class="subhead">种族·个体·性格 · 威力连击 · 星陨印记</div>
 
-    <!-- 能力值计算器 -->
+    <!-- 能力值工坊 -->
     <div class="card">
         <div class="card-title"><span>📊 能力值工坊</span></div>
         <div class="two-column">
-            <!-- 攻击方 -->
             <div class="stat-box">
                 <h3>⚡ 攻击方</h3>
                 <div class="input-group">
@@ -297,21 +346,19 @@
                 </div>
                 <div class="input-group">
                     <label>初始个体值 (0~10)</label>
-                    <input type="number" id="atkIndiv" value="8" min="0" max="10" step="1" inputmode="numeric">
+                    <input type="number" id="atkIndiv" value="10" min="0" max="10" step="1" inputmode="numeric">
                 </div>
                 <div class="input-group">
                     <label>性格修正</label>
                     <select id="atkNature">
-                        <option value="1.2">➕ 1.2 (加成)</option>
-                        <option value="1.0" selected>🟰 1.0 (无修正)</option>
-                        <option value="0.9">➖ 0.9 (削弱)</option>
+                        <option value="0.2">➕ +20% (加成)</option>
+                        <option value="0" selected>🟰 0% (无修正)</option>
+                        <option value="-0.1">➖ -10% (削弱)</option>
                     </select>
                 </div>
                 <div class="result-badge" id="atkResult">0</div>
                 <button class="fill-btn" id="fillAtkToDamage">⬆️ 填入攻击力</button>
-                <div class="small-note" style="margin-top:10px;">用于物理/魔法</div>
             </div>
-            <!-- 防御方 -->
             <div class="stat-box">
                 <h3>🛡️ 防御方</h3>
                 <div class="input-group">
@@ -320,40 +367,61 @@
                 </div>
                 <div class="input-group">
                     <label>初始个体值 (0~10)</label>
-                    <input type="number" id="defIndiv" value="7" min="0" max="10" step="1" inputmode="numeric">
+                    <input type="number" id="defIndiv" value="10" min="0" max="10" step="1" inputmode="numeric">
                 </div>
                 <div class="input-group">
                     <label>性格修正</label>
                     <select id="defNature">
-                        <option value="1.2">➕ 1.2 (加成)</option>
-                        <option value="1.0" selected>🟰 1.0 (无修正)</option>
-                        <option value="0.9">➖ 0.9 (削弱)</option>
+                        <option value="0.2">➕ +20% (加成)</option>
+                        <option value="0" selected>🟰 0% (无修正)</option>
+                        <option value="-0.1">➖ -10% (削弱)</option>
                     </select>
                 </div>
                 <div class="result-badge" id="defResult">0</div>
                 <button class="fill-btn" id="fillDefToDamage">⬇️ 填入防御力</button>
-                <div class="small-note">物防 / 魔抗通用</div>
             </div>
         </div>
-        <div style="margin-top: 16px; font-size:0.95rem; color:#2b5e2b; text-align:center; background:#def0d4; padding:10px; border-radius:40px;">
-            💡 (1.1×(种族+0.5×(个体×6))+10)×性格+50
+        <!-- 生命值 -->
+        <div class="stat-box" style="margin-top: 18px;">
+            <h3>❤️ 生命值</h3>
+            <div class="flex-row" style="gap: 12px;">
+                <div class="input-group" style="flex:1;">
+                    <label>种族值</label>
+                    <input type="number" id="hpRace" value="150" min="1" max="300" step="1" inputmode="numeric">
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <label>初始个体值 (0~10)</label>
+                    <input type="number" id="hpIndiv" value="10" min="0" max="10" step="1" inputmode="numeric">
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <label>性格修正</label>
+                    <select id="hpNature">
+                        <option value="0.2">➕ +20%</option>
+                        <option value="0" selected>🟰 0%</option>
+                        <option value="-0.1">➖ -10%</option>
+                    </select>
+                </div>
+            </div>
+            <div class="result-badge hp-badge" id="hpResult">0</div>
+            <button class="fill-btn" id="fillHPToTarget" style="background:#c2a15b; border-color:#8b6f2d;">🎯 填入目标生命值</button>
+            <div class="formula-note hp-formula" style="margin-top:8px;">
+                💡 [1.7×种族 + 个体×0.85 + 70]×(1+性格) + 100
+            </div>
+        </div>
+        <div class="formula-note" style="margin-top:12px;">
+            💡 其他能力: [1.1×种族 + 个体×0.55 + 10]×(1+性格) + 50
         </div>
     </div>
 
-    <!-- 伤害计算核心 -->
+    <!-- 伤害演算 -->
     <div class="card">
         <div class="card-title"><span>💥 伤害演算</span></div>
-        <div class="formula-highlight">
-            ⚡ 0.9 × (a + f) × b × c × d × (攻击/防御) × e
-        </div>
         
-        <!-- 技能类型切换 -->
         <div class="type-selector">
-            <div class="type-btn active" id="typePhysical">⚔️ 物理 · 攻/防</div>
-            <div class="type-btn" id="typeMagic">🔮 魔法 · 魔攻/魔抗</div>
+            <div class="type-btn active" id="typePhysical">⚔️ 物理</div>
+            <div class="type-btn" id="typeMagic">🔮 魔法</div>
         </div>
 
-        <!-- 攻击 / 防御 -->
         <div class="flex-row">
             <div class="input-group" style="flex:1;">
                 <label>🗡️ 攻击力</label>
@@ -365,7 +433,6 @@
             </div>
         </div>
 
-        <!-- 第一行: a (基础威力) 与 f (威力增加) -->
         <div class="damage-formula-row">
             <div class="input-group">
                 <label>a · 基础威力</label>
@@ -377,7 +444,19 @@
             </div>
         </div>
 
-        <!-- 第二行: b 本系加成 -->
+        <button class="toggle-btn" id="toggleStarMark">⭐ 星陨印记 (点击启用)</button>
+        <div id="starMarkPanel" class="mark-panel" style="display: none;">
+            <div class="input-group" style="margin-bottom: 8px;">
+                <label>印记层数 x</label>
+                <input type="number" id="markX" value="0" min="0" step="1" inputmode="numeric">
+            </div>
+            <div class="small-note" style="margin-bottom: 8px;">
+                📐 印记威力 y = x² + 24x - 24
+            </div>
+            <div class="result-badge" style="font-size:1.4rem; background:#4e326b;" id="markYResult">0</div>
+            <div class="small-note" style="margin-top:6px; color:#7a4a9a;">※ 印记伤害无本系加成 (b=1.0)</div>
+        </div>
+
         <div class="damage-formula-row">
             <div class="input-group">
                 <label>b · 本系加成</label>
@@ -398,35 +477,46 @@
             </div>
         </div>
 
-        <!-- 第三行: c自定义 与 d增减益 -->
         <div class="damage-formula-row">
-            <div class="input-group">
-                <label>c 自定义</label>
-                <input type="number" id="customC" value="2.0" step="0.1" min="0.1" inputmode="decimal">
-            </div>
             <div class="input-group">
                 <label>d · 增减益</label>
                 <input type="number" id="buffD" value="1.0" step="0.1" min="0.1" inputmode="decimal">
             </div>
-        </div>
-
-        <!-- 第四行: e 连击数 -->
-        <div class="damage-formula-row">
             <div class="input-group">
                 <label>e · 连击数</label>
                 <input type="number" id="comboE" value="1" min="1" step="1" inputmode="numeric">
             </div>
         </div>
 
+        <!-- 求解击杀条件 -->
+        <div class="solve-row">
+            <div class="input-group">
+                <label>🎯 目标生命值</label>
+                <input type="number" id="targetHP" value="500" min="1" step="1" inputmode="numeric">
+            </div>
+            <div class="input-group">
+                <label>求解变量</label>
+                <select id="solveVar">
+                    <option value="atk">攻击力</option>
+                    <option value="a">基础威力 a</option>
+                    <option value="f">威力增加 f</option>
+                    <option value="d">增减益 d</option>
+                    <option value="e">连击数 e</option>
+                </select>
+            </div>
+            <button class="solve-btn" id="solveBtn">🔍 求解</button>
+        </div>
+        <div id="solveResult" class="solve-result-box" style="display: none;"></div>
+
         <div class="damage-preview">
-            <div class="damage-label">预估伤害</div>
+            <div class="damage-label">总伤害</div>
             <div class="damage-number" id="damageOutput">--</div>
         </div>
         <div id="damageNote" class="small-note" style="text-align:center;"></div>
         <button id="calcDamageBtn">🔥 计算伤害</button>
     </div>
     <div class="footnote">
-        * 连击数e为总段数 · f为威力增加值 · 洛克王国世界
+        * 总伤害 = 技能伤害 + 星陨印记伤害 (印记无本系加成)
     </div>
 </div>
 
@@ -434,15 +524,26 @@
     (function(){
         "use strict";
 
-        function calcAbility(race, indiv, natureMult) {
+        // ---------- 能力值公式 ----------
+        function calcOtherAbility(race, indiv, natureRate) {
             race = parseFloat(race) || 0;
             indiv = parseFloat(indiv) || 0;
-            natureMult = parseFloat(natureMult) || 1.0;
-            const inner = 1.1 * (race + 0.5 * (indiv * 6)) + 10;
-            let result = inner * natureMult + 50;
+            natureRate = parseFloat(natureRate) || 0;
+            const inner = 1.1 * race + indiv * 0.55 + 10;
+            let result = inner * (1 + natureRate) + 50;
             return Math.round(result * 10) / 10;
         }
 
+        function calcHP(race, indiv, natureRate) {
+            race = parseFloat(race) || 0;
+            indiv = parseFloat(indiv) || 0;
+            natureRate = parseFloat(natureRate) || 0;
+            const inner = 1.7 * race + indiv * 0.85 + 70;
+            let result = inner * (1 + natureRate) + 100;
+            return Math.round(result * 10) / 10;
+        }
+
+        // DOM 元素
         const atkRace = document.getElementById('atkRace');
         const atkIndiv = document.getElementById('atkIndiv');
         const atkNature = document.getElementById('atkNature');
@@ -453,87 +554,215 @@
         const defNature = document.getElementById('defNature');
         const defResult = document.getElementById('defResult');
 
+        const hpRace = document.getElementById('hpRace');
+        const hpIndiv = document.getElementById('hpIndiv');
+        const hpNature = document.getElementById('hpNature');
+        const hpResult = document.getElementById('hpResult');
+
         const damageAtk = document.getElementById('damageAtk');
         const damageDef = document.getElementById('damageDef');
         const powerA = document.getElementById('powerA');
-        const powerF = document.getElementById('powerF');   // 新增 f 威力增加
+        const powerF = document.getElementById('powerF');
         const stabB = document.getElementById('stabB');
         const typeC = document.getElementById('typeC');
-        const customC = document.getElementById('customC');
         const buffD = document.getElementById('buffD');
         const comboE = document.getElementById('comboE');
         const damageOutput = document.getElementById('damageOutput');
         const damageNote = document.getElementById('damageNote');
 
+        const toggleBtn = document.getElementById('toggleStarMark');
+        const starPanel = document.getElementById('starMarkPanel');
+        const markX = document.getElementById('markX');
+        const markYResult = document.getElementById('markYResult');
+
         const btnPhysical = document.getElementById('typePhysical');
         const btnMagic = document.getElementById('typeMagic');
         let skillType = 'physical';
+        let starMarkActive = false;
+
+        // 求解相关
+        const targetHP = document.getElementById('targetHP');
+        const solveVar = document.getElementById('solveVar');
+        const solveBtn = document.getElementById('solveBtn');
+        const solveResultDiv = document.getElementById('solveResult');
 
         function updateAbilityResults() {
             const aRace = parseFloat(atkRace.value) || 0;
             const aIndiv = parseFloat(atkIndiv.value) || 0;
-            const aNat = parseFloat(atkNature.value) || 1.0;
-            const atkVal = calcAbility(aRace, aIndiv, aNat);
-            atkResult.textContent = atkVal.toFixed(1);
+            const aNat = parseFloat(atkNature.value) || 0;
+            atkResult.textContent = calcOtherAbility(aRace, aIndiv, aNat).toFixed(1);
 
             const dRace = parseFloat(defRace.value) || 0;
             const dIndiv = parseFloat(defIndiv.value) || 0;
-            const dNat = parseFloat(defNature.value) || 1.0;
-            const defVal = calcAbility(dRace, dIndiv, dNat);
-            defResult.textContent = defVal.toFixed(1);
+            const dNat = parseFloat(defNature.value) || 0;
+            defResult.textContent = calcOtherAbility(dRace, dIndiv, dNat).toFixed(1);
+
+            const hRace = parseFloat(hpRace.value) || 0;
+            const hIndiv = parseFloat(hpIndiv.value) || 0;
+            const hNat = parseFloat(hpNature.value) || 0;
+            hpResult.textContent = calcHP(hRace, hIndiv, hNat).toFixed(1);
         }
 
-        function fillAttackToDamage() {
-            damageAtk.value = parseFloat(atkResult.textContent).toFixed(1);
-            computeDamage();
+        function calcStarMarkPower(x) {
+            if (x < 0) x = 0;
+            return x * x + 24 * x - 24;
         }
-        function fillDefenseToDamage() {
-            damageDef.value = parseFloat(defResult.textContent).toFixed(1);
-            computeDamage();
+
+        function calcDamageSingle(power, atk, def, b, c, d, e) {
+            return 0.9 * power * b * c * d * (atk / def) * e;
+        }
+
+        function getCommonParams() {
+            const atk = parseFloat(damageAtk.value);
+            const def = parseFloat(damageDef.value);
+            const a = parseFloat(powerA.value) || 0;
+            const f = parseFloat(powerF.value) || 0;
+            const skillPower = a + f;
+            const bSkill = parseFloat(stabB.value) || 1.0;
+            const c = parseFloat(typeC.value) || 2.0;  // 直接使用下拉值
+            const d = parseFloat(buffD.value) || 1.0;
+            const e = parseFloat(comboE.value) || 1;
+            let markPower = 0;
+            if (starMarkActive) {
+                const x = parseFloat(markX.value) || 0;
+                markPower = calcStarMarkPower(x);
+            }
+            return { atk, def, a, f, skillPower, bSkill, c, d, e, markPower };
         }
 
         function computeDamage() {
-            const atk = parseFloat(damageAtk.value);
-            const def = parseFloat(damageDef.value);
-            if (isNaN(atk) || isNaN(def) || def === 0) {
+            const p = getCommonParams();
+            if (isNaN(p.atk) || isNaN(p.def) || p.def === 0) {
                 damageOutput.textContent = 'ERR';
                 damageNote.textContent = '攻击/防御无效，防御不能为0';
-                return;
+                return 0;
             }
-            const a = parseFloat(powerA.value) || 0;
-            const f = parseFloat(powerF.value) || 0;      // 威力增加
-            const b = parseFloat(stabB.value) || 1.0;
-            let c = parseFloat(customC.value);
-            if (isNaN(c) || c <= 0) c = 2.0;
-            const d = parseFloat(buffD.value) || 1.0;
-            const e = parseFloat(comboE.value) || 1;
 
-            // 新公式: 0.9 * (a + f) * b * c * d * (攻击/防御) * e
-            const base = 0.9 * (a + f) * b * c * d * (atk / def) * e;
-            const damageVal = Math.round(base * 100) / 100;
-            damageOutput.textContent = damageVal.toFixed(1);
-            
+            const skillDamage = calcDamageSingle(p.skillPower, p.atk, p.def, p.bSkill, p.c, p.d, p.e);
+            let markDamage = 0;
+            if (starMarkActive) {
+                markYResult.textContent = p.markPower.toFixed(1);
+                markDamage = calcDamageSingle(p.markPower, p.atk, p.def, 1.0, p.c, p.d, p.e);
+            } else {
+                markYResult.textContent = '0';
+            }
+
+            const totalDamage = skillDamage + markDamage;
+            damageOutput.textContent = totalDamage.toFixed(1);
+
             let typeStr = (skillType === 'physical') ? '物理' : '魔法';
-            damageNote.textContent = `${typeStr} · 总威力 ${a+f} · 克制系数: ${c.toFixed(3)}`;
+            let markInfo = starMarkActive ? ` + 印记 ${markDamage.toFixed(1)} (威力${p.markPower.toFixed(1)})` : '';
+            damageNote.textContent = `${typeStr} · 技能 ${skillDamage.toFixed(1)}${markInfo}`;
+            return totalDamage;
         }
 
-        function syncCFromSelect() {
-            customC.value = typeC.value;
+        // ---------- 求解（不修改原始输入）----------
+        function solveForVariable() {
+            const p = getCommonParams();
+            const target = parseFloat(targetHP.value);
+            if (isNaN(target) || target <= 0) {
+                solveResultDiv.style.display = 'block';
+                solveResultDiv.textContent = '请输入有效的目标生命值';
+                return;
+            }
+            if (isNaN(p.def) || p.def === 0) {
+                solveResultDiv.style.display = 'block';
+                solveResultDiv.textContent = '防御力不能为0';
+                return;
+            }
+
+            const varType = solveVar.value;
+            let requiredValue, resultDamage;
+
+            // 计算所需值（保持原始输入不变）
+            const baseFactors = 0.9 * p.c * p.d * (1 / p.def);
+            const powerTerm = p.skillPower * p.bSkill + p.markPower;
+
+            if (varType === 'atk') {
+                const coeff = baseFactors * powerTerm * p.e;
+                if (coeff === 0) {
+                    solveResultDiv.style.display = 'block';
+                    solveResultDiv.textContent = '当前参数下伤害恒为0，无法求解';
+                    return;
+                }
+                requiredValue = target / coeff;
+                resultDamage = calcDamageSingle(p.skillPower, requiredValue, p.def, p.bSkill, p.c, p.d, p.e)
+                              + (starMarkActive ? calcDamageSingle(p.markPower, requiredValue, p.def, 1.0, p.c, p.d, p.e) : 0);
+                solveResultDiv.textContent = `最低攻击力 ≈ ${requiredValue.toFixed(1)}，对应伤害 ≈ ${resultDamage.toFixed(1)}`;
+            } else if (varType === 'a') {
+                const baseMult = 0.9 * p.c * p.d * (p.atk / p.def) * p.e;
+                if (baseMult * p.bSkill === 0) {
+                    solveResultDiv.style.display = 'block';
+                    solveResultDiv.textContent = '无法通过基础威力调整伤害';
+                    return;
+                }
+                requiredValue = (target / baseMult - p.markPower) / p.bSkill - p.f;
+                requiredValue = Math.ceil(requiredValue);
+                const newSkillPower = requiredValue + p.f;
+                resultDamage = calcDamageSingle(newSkillPower, p.atk, p.def, p.bSkill, p.c, p.d, p.e)
+                              + (starMarkActive ? calcDamageSingle(p.markPower, p.atk, p.def, 1.0, p.c, p.d, p.e) : 0);
+                solveResultDiv.textContent = `最低基础威力 a ≈ ${requiredValue}，对应伤害 ≈ ${resultDamage.toFixed(1)}`;
+            } else if (varType === 'f') {
+                const baseMult = 0.9 * p.c * p.d * (p.atk / p.def) * p.e;
+                if (baseMult * p.bSkill === 0) {
+                    solveResultDiv.style.display = 'block';
+                    solveResultDiv.textContent = '无法通过威力增加调整伤害';
+                    return;
+                }
+                requiredValue = (target / baseMult - p.markPower) / p.bSkill - p.a;
+                requiredValue = Math.ceil(Math.max(0, requiredValue));
+                const newSkillPower = p.a + requiredValue;
+                resultDamage = calcDamageSingle(newSkillPower, p.atk, p.def, p.bSkill, p.c, p.d, p.e)
+                              + (starMarkActive ? calcDamageSingle(p.markPower, p.atk, p.def, 1.0, p.c, p.d, p.e) : 0);
+                solveResultDiv.textContent = `最低威力增加 f ≈ ${requiredValue}，对应伤害 ≈ ${resultDamage.toFixed(1)}`;
+            } else if (varType === 'd') {
+                const baseMult = 0.9 * p.c * (p.atk / p.def) * p.e * powerTerm;
+                if (baseMult === 0) {
+                    solveResultDiv.style.display = 'block';
+                    solveResultDiv.textContent = '无法通过增减益调整伤害';
+                    return;
+                }
+                requiredValue = target / baseMult;
+                requiredValue = Math.ceil(requiredValue * 10) / 10;
+                resultDamage = calcDamageSingle(p.skillPower, p.atk, p.def, p.bSkill, p.c, requiredValue, p.e)
+                              + (starMarkActive ? calcDamageSingle(p.markPower, p.atk, p.def, 1.0, p.c, requiredValue, p.e) : 0);
+                solveResultDiv.textContent = `最低增减益 d ≈ ${requiredValue.toFixed(1)}，对应伤害 ≈ ${resultDamage.toFixed(1)}`;
+            } else if (varType === 'e') {
+                const baseMult = 0.9 * p.c * p.d * (p.atk / p.def) * powerTerm;
+                if (baseMult === 0) {
+                    solveResultDiv.style.display = 'block';
+                    solveResultDiv.textContent = '无法通过连击数调整伤害';
+                    return;
+                }
+                requiredValue = target / baseMult;
+                requiredValue = Math.ceil(requiredValue);
+                resultDamage = calcDamageSingle(p.skillPower, p.atk, p.def, p.bSkill, p.c, p.d, requiredValue)
+                              + (starMarkActive ? calcDamageSingle(p.markPower, p.atk, p.def, 1.0, p.c, p.d, requiredValue) : 0);
+                solveResultDiv.textContent = `最低连击数 e ≈ ${requiredValue}，对应伤害 ≈ ${resultDamage.toFixed(1)}`;
+            }
+
+            solveResultDiv.style.display = 'block';
         }
 
         function bindEvents() {
-            const abilityInputs = [atkRace, atkIndiv, atkNature, defRace, defIndiv, defNature];
+            const abilityInputs = [atkRace, atkIndiv, atkNature, defRace, defIndiv, defNature,
+                                   hpRace, hpIndiv, hpNature];
             abilityInputs.forEach(el => el.addEventListener('input', updateAbilityResults));
             
-            document.getElementById('fillAtkToDamage').addEventListener('click', fillAttackToDamage);
-            document.getElementById('fillDefToDamage').addEventListener('click', fillDefenseToDamage);
-            document.getElementById('calcDamageBtn').addEventListener('click', computeDamage);
-
-            typeC.addEventListener('change', function() {
-                syncCFromSelect();
+            document.getElementById('fillAtkToDamage').addEventListener('click', function() {
+                damageAtk.value = parseFloat(atkResult.textContent).toFixed(1);
                 computeDamage();
             });
-            
+            document.getElementById('fillDefToDamage').addEventListener('click', function() {
+                damageDef.value = parseFloat(defResult.textContent).toFixed(1);
+                computeDamage();
+            });
+            document.getElementById('fillHPToTarget').addEventListener('click', function() {
+                targetHP.value = parseFloat(hpResult.textContent).toFixed(1);
+                computeDamage();
+            });
+            document.getElementById('calcDamageBtn').addEventListener('click', computeDamage);
+
             btnPhysical.addEventListener('click', function() {
                 btnPhysical.classList.add('active');
                 btnMagic.classList.remove('active');
@@ -547,42 +776,60 @@
                 computeDamage();
             });
 
-            // 包含新增的 powerF
-            const damageInputs = [damageAtk, damageDef, powerA, powerF, stabB, customC, buffD, comboE];
+            toggleBtn.addEventListener('click', function() {
+                starMarkActive = !starMarkActive;
+                if (starMarkActive) {
+                    starPanel.style.display = 'block';
+                    toggleBtn.textContent = '⭐ 星陨印记 (已启用)';
+                    toggleBtn.classList.add('active-toggle');
+                } else {
+                    starPanel.style.display = 'none';
+                    toggleBtn.textContent = '⭐ 星陨印记 (点击启用)';
+                    toggleBtn.classList.remove('active-toggle');
+                }
+                computeDamage();
+            });
+
+            markX.addEventListener('input', function() {
+                if (starMarkActive) computeDamage();
+            });
+
+            const damageInputs = [damageAtk, damageDef, powerA, powerF, stabB, typeC, buffD, comboE, targetHP];
             damageInputs.forEach(el => el.addEventListener('input', computeDamage));
             stabB.addEventListener('change', computeDamage);
+            typeC.addEventListener('change', computeDamage);
+
+            solveBtn.addEventListener('click', solveForVariable);
             
             updateAbilityResults();
             setTimeout(() => {
-                fillAttackToDamage();
-                fillDefenseToDamage();
+                document.getElementById('fillAtkToDamage').click();
+                document.getElementById('fillDefToDamage').click();
             }, 30);
         }
 
-        function clampIndiv(inputEl) {
+        function clampIndiv(inputEl, callback) {
             let val = parseInt(inputEl.value);
             if (isNaN(val)) val = 0;
             val = Math.min(10, Math.max(0, val));
             inputEl.value = val;
-            updateAbilityResults();
+            if (callback) callback();
         }
-        atkIndiv.addEventListener('change', function() { clampIndiv(atkIndiv); });
-        defIndiv.addEventListener('change', function() { clampIndiv(defIndiv); });
-        atkIndiv.addEventListener('input', function() { 
-            let v = parseInt(this.value); if(!isNaN(v)) this.value = Math.min(10, Math.max(0, v));
-        });
-        defIndiv.addEventListener('input', function() { 
-            let v = parseInt(this.value); if(!isNaN(v)) this.value = Math.min(10, Math.max(0, v));
+        [atkIndiv, defIndiv, hpIndiv].forEach(inp => {
+            inp.addEventListener('change', function() { clampIndiv(inp, updateAbilityResults); });
+            inp.addEventListener('input', function() { 
+                let v = parseInt(this.value); 
+                if(!isNaN(v)) this.value = Math.min(10, Math.max(0, v));
+            });
         });
 
-        [atkRace, defRace].forEach(inp => inp.addEventListener('change', function() {
+        [atkRace, defRace, hpRace].forEach(inp => inp.addEventListener('change', function() {
             let v = parseFloat(this.value);
             if (v < 1) this.value = 1;
             updateAbilityResults();
         }));
 
         bindEvents();
-        syncCFromSelect();
     })();
 </script>
 </body>

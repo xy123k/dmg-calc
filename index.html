@@ -405,11 +405,11 @@
             <div class="result-badge hp-badge" id="hpResult">0</div>
             <button class="fill-btn" id="fillHPToTarget" style="background:#c2a15b; border-color:#8b6f2d;">🎯 填入目标生命值</button>
             <div class="formula-note hp-formula" style="margin-top:8px;">
-                💡 [1.7×种族 + 个体×0.85 + 70]×(1+性格) + 100
+                💡 [1.7×种族 + 个体×0.85×6 + 70]×(1+性格) + 100
             </div>
         </div>
         <div class="formula-note" style="margin-top:12px;">
-            💡 其他能力: [1.1×种族 + 个体×0.55 + 10]×(1+性格) + 50
+            💡 其他能力: [1.1×种族 + 个体×0.55×6 + 10]×(1+性格) + 50
         </div>
     </div>
 
@@ -524,12 +524,13 @@
     (function(){
         "use strict";
 
-        // ---------- 能力值公式 ----------
+        // ---------- 新版能力值公式 ----------
         function calcOtherAbility(race, indiv, natureRate) {
             race = parseFloat(race) || 0;
             indiv = parseFloat(indiv) || 0;
             natureRate = parseFloat(natureRate) || 0;
-            const inner = 1.1 * race + indiv * 0.55 + 10;
+            // 个体值项 × 0.55 × 6
+            const inner = 1.1 * race + indiv * 0.55 * 6 + 10;
             let result = inner * (1 + natureRate) + 50;
             return Math.round(result * 10) / 10;
         }
@@ -538,7 +539,8 @@
             race = parseFloat(race) || 0;
             indiv = parseFloat(indiv) || 0;
             natureRate = parseFloat(natureRate) || 0;
-            const inner = 1.7 * race + indiv * 0.85 + 70;
+            // 个体值项 × 0.85 × 6
+            const inner = 1.7 * race + indiv * 0.85 * 6 + 70;
             let result = inner * (1 + natureRate) + 100;
             return Math.round(result * 10) / 10;
         }
@@ -580,7 +582,6 @@
         let skillType = 'physical';
         let starMarkActive = false;
 
-        // 求解相关
         const targetHP = document.getElementById('targetHP');
         const solveVar = document.getElementById('solveVar');
         const solveBtn = document.getElementById('solveBtn');
@@ -619,7 +620,7 @@
             const f = parseFloat(powerF.value) || 0;
             const skillPower = a + f;
             const bSkill = parseFloat(stabB.value) || 1.0;
-            const c = parseFloat(typeC.value) || 2.0;  // 直接使用下拉值
+            const c = parseFloat(typeC.value) || 2.0;
             const d = parseFloat(buffD.value) || 1.0;
             const e = parseFloat(comboE.value) || 1;
             let markPower = 0;
@@ -656,7 +657,6 @@
             return totalDamage;
         }
 
-        // ---------- 求解（不修改原始输入）----------
         function solveForVariable() {
             const p = getCommonParams();
             const target = parseFloat(targetHP.value);
@@ -674,7 +674,6 @@
             const varType = solveVar.value;
             let requiredValue, resultDamage;
 
-            // 计算所需值（保持原始输入不变）
             const baseFactors = 0.9 * p.c * p.d * (1 / p.def);
             const powerTerm = p.skillPower * p.bSkill + p.markPower;
 
